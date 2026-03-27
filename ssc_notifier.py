@@ -17,18 +17,29 @@ def send_telegram(message):
     requests.post(url, data=data)
 
 def get_notices():
-    response = requests.get(URL)
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    for _ in range(3):  # retry 3 times
+        try:
+            response = requests.get(URL, headers=headers, timeout=10)
+            response.raise_for_status()
+            break
+        except requests.exceptions.RequestException:
+            continue
+    else:
+        return []  # if all retries fail
+
     soup = BeautifulSoup(response.text, "html.parser")
 
     notices = []
-    
-    # ⚠️ This selector may need adjustment later
     for a in soup.find_all("a"):
         text = a.text.strip()
         if text:
             notices.append(text)
 
-    return notices[:20]  # limit to avoid spam
+    return notices[:20]
 
 def load_old():
     if os.path.exists("data.json"):
