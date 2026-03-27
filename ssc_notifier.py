@@ -52,7 +52,19 @@ def save_new(data):
         json.dump(data, f)
 
 def main():
-    send_telegram("✅ Bot is working!")
+    old = load_old()
+    new = get_notices()
+
+    if not old:
+        send_telegram("✅ SSC Notifier started successfully!")
+    
+    updates = [n for n in new if n not in old]
+
+    if updates:
+        msg = "🚨 SSC New Updates:\n\n" + "\n".join(updates[:5])
+        send_telegram(msg)
+
+    save_new(new)
 
 if __name__ == "__main__":
     main()
