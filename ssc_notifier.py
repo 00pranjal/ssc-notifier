@@ -48,8 +48,20 @@ def load_old():
     return []
 
 def save_new(data):
+    import subprocess
+    import json
+
     with open("data.json", "w") as f:
         json.dump(data, f)
+
+    # Configure git
+    subprocess.run(["git", "config", "--global", "user.email", "bot@example.com"])
+    subprocess.run(["git", "config", "--global", "user.name", "github-actions"])
+
+    # Add & commit only if changes exist
+    subprocess.run(["git", "add", "data.json"])
+    subprocess.run(["git", "commit", "-m", "Update data"], check=False)
+    subprocess.run(["git", "push"])
 
 def main():
     old = load_old()
