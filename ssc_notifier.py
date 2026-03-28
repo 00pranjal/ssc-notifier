@@ -54,9 +54,6 @@ def save_new(data):
 def main():
     old = load_old()
     new = get_notices()
-
-    if not old:
-        send_telegram("✅ SSC Notifier started successfully!")
     
     updates = [n for n in new if n not in old]
 
