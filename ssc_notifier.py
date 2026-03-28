@@ -21,12 +21,20 @@ def get_notices():
         "User-Agent": "Mozilla/5.0"
     }
 
-    response = requests.get(URL, headers=headers, timeout=10)
+    for _ in range(3):  # retry 3 times
+        try:
+            response = requests.get(URL, headers=headers, timeout=15)
+            response.raise_for_status()
+            break
+        except requests.exceptions.RequestException:
+            continue
+    else:
+        return []  # if all retries fail
+
     soup = BeautifulSoup(response.text, "html.parser")
 
     notices = []
 
-    # Try extracting list items (more likely to contain notices)
     for li in soup.find_all("li"):
         text = li.text.strip()
         if text and len(text) > 20:
