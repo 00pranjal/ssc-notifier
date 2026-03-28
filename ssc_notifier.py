@@ -24,20 +24,23 @@ def get_notices():
     try:
         response = requests.get(URL, headers=headers, timeout=15)
         response.raise_for_status()
-    except:
+    except Exception as e:
+        print("ERROR:", e)
         return []
+
+    print("STATUS CODE:", response.status_code)
+    print("PAGE LENGTH:", len(response.text))
 
     soup = BeautifulSoup(response.text, "html.parser")
 
     notices = []
 
-    # Look for links (not all, filter properly)
     for a in soup.find_all("a"):
         text = a.text.strip()
-        href = a.get("href", "")
-
-        if text and "notice" in text.lower():
+        if text:
             notices.append(text)
+
+    print("FOUND NOTICES:", len(notices))
 
     return notices[:20]
 
