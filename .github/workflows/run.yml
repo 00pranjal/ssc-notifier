@@ -1,10 +1,12 @@
 name: SSC Notifier
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: "*/10 * * * *"  # every 10 minutes
   workflow_dispatch:
-  push:
 
 jobs:
   run-script:
@@ -26,4 +28,7 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python ssc_notifier.py
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          python ssc_notifier.py
