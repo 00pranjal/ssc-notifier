@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import os
 
-URL = "https://ssc.gov.in"
+URL = "https://ssc.gov.in/home/notice-board"
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -21,23 +21,22 @@ def get_notices():
         "User-Agent": "Mozilla/5.0"
     }
 
-    for _ in range(3):  # retry 3 times
-        try:
-            response = requests.get(URL, headers=headers, timeout=15)
-            response.raise_for_status()
-            break
-        except requests.exceptions.RequestException:
-            continue
-    else:
-        return []  # if all retries fail
+    try:
+        response = requests.get(URL, headers=headers, timeout=15)
+        response.raise_for_status()
+    except:
+        return []
 
     soup = BeautifulSoup(response.text, "html.parser")
 
     notices = []
 
-    for li in soup.find_all("li"):
-        text = li.text.strip()
-        if text and len(text) > 20:
+    # Look for links (not all, filter properly)
+    for a in soup.find_all("a"):
+        text = a.text.strip()
+        href = a.get("href", "")
+
+        if text and "notice" in text.lower():
             notices.append(text)
 
     return notices[:20]
